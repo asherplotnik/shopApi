@@ -1,8 +1,12 @@
 package app.core.services;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.transaction.Transactional;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -12,6 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -102,7 +107,7 @@ public class AdminService {
 		collectionRepository.deleteById(id);
 		return id;
 	}
-	
+
 	public int deleteItemById(int id) throws ApiException {
 		itemRepository.deleteById(id);
 		return id;
@@ -168,7 +173,7 @@ public class AdminService {
 		}
 		Collection content = opt.get();
 		Optional<Collection> collection = collectionRepository.findByName(payload.getMainTitle());
-		if(collection.isPresent() && collection.get().getId() != content.getId())
+		if (collection.isPresent() && collection.get().getId() != content.getId())
 			throw new ApiException("Collection name duplicate!!!");
 		content.setName(payload.getMainTitle());
 		content.setDescription(payload.getMainTitleT());
@@ -186,12 +191,12 @@ public class AdminService {
 			if (image2Url == null)
 				throw new ApiException("No image Found");
 			Item item = new Item();
-			if(itemRepository.getByCode(payload.getMainTitle()).isPresent())
+			if (itemRepository.getByCode(payload.getMainTitle()).isPresent())
 				throw new ApiException("Duplicate Code \"" + payload.getMainTitle() + "\" Found !!!");
 			item.setCode(payload.getMainTitle());
 			Optional<Collection> collection = collectionRepository.findByName(payload.getMainTitleT());
 			if (collection.isEmpty())
-					throw new ApiException("Collection Dont exists !!!");
+				throw new ApiException("Collection Dont exists !!!");
 			item.setCollection(collection.get());
 			item.setDescription(payload.getFirstParagraph());
 			item.setSize(Double.parseDouble(payload.getFirstParagraphT()));
@@ -206,6 +211,7 @@ public class AdminService {
 			throw new ApiException(e.getLocalizedMessage());
 		}
 	}
+
 	public Item updateItem(PayLoad payload) throws ApiException {
 		try {
 			Optional<Item> opt = itemRepository.findById(payload.getId());
@@ -219,7 +225,7 @@ public class AdminService {
 				throw new ApiException("No image Found");
 			Item item = opt.get();
 			Optional<Item> toChk = itemRepository.getByCode(item.getCode());
-			if(toChk.isPresent() && toChk.get().getId() != item.getId() ) {
+			if (toChk.isPresent() && toChk.get().getId() != item.getId()) {
 				throw new ApiException("Duplicate Code \"" + payload.getMainTitle() + "\" Found !!!");
 			}
 			item.setCode(payload.getMainTitle());
@@ -240,11 +246,11 @@ public class AdminService {
 			throw new ApiException(e.getLocalizedMessage());
 		}
 	}
-	
+
 	public String bulkUpload(PayLoad payload) throws ApiException {
 		try {
 			System.out.println(payload.getFirstImage().getOriginalFilename());
-			System.out.println(payload.getSecondImage().getOriginalFilename());		
+			System.out.println(payload.getSecondImage().getOriginalFilename());
 			boolean first = handleExcelFile(payload.getFirstImage());
 			boolean second = handleZipFile(payload.getSecondImage());
 			if (first && second)
@@ -279,40 +285,116 @@ public class AdminService {
 			return null;
 		}
 	}
-	
-	private boolean handleExcelFile(MultipartFile fileM) throws ApiException{
-		try(FileInputStream file = (FileInputStream)fileM.getInputStream(); 
-			Workbook workbook = new XSSFWorkbook(file);) {
+
+	private String uploadImageToImgbb(FileSystemResource image) {
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+			body.add("image", image);
+			HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+			String serverUrl = "https://api.imgbb.com/1/upload?key=" + imgbbApiKey;
+			RestTemplate restTemplate = new RestTemplate();
+			ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
+			String json = response.getBody();
+			JSONParser jsonParser = new JSONParser();
+			JSONObject jsonObject = (JSONObject) jsonParser.parse(json);
+			JSONObject data = (JSONObject) jsonObject.get("data");
+			return (String) data.get("url");
+		} catch (Exception e) {
+			System.out.println(e.getLocalizedMessage());
+			return null;
+		}
+	}
+
+	private boolean handleExcelFile(MultipartFile fileM) throws ApiException {
+		try (FileInputStream file = (FileInputStream) fileM.getInputStream();
+				Workbook workbook = new XSSFWorkbook(file);) {
 			Sheet sheet = workbook.getSheetAt(0);
-			sheet.shiftRows(1,sheet.getLastRowNum() + 1, -1);
+			sheet.shiftRows(1, sheet.getLastRowNum() + 1, -1);
 			for (Row row : sheet) {
 				Item item = new Item();
-				if(itemRepository.getByCode(row.getCell(1).getRichStringCellValue().getString()).isPresent()) {
-					throw new ApiException("Duplicate Code \"" + row.getCell(1).getRichStringCellValue().getString() + "\" Found !!!");
+				if (itemRepository.getByCode(row.getCell(0).getRichStringCellValue().getString()).isPresent()) {
+					throw new ApiException(
+							"Duplicate Code \"" + row.getCell(0).getRichStringCellValue().getString() + "\" Found !!!");
 				}
-				item.setCode(row.getCell(1).getRichStringCellValue().getString());
-				String collection = row.getCell(2).getRichStringCellValue().getString();
+				item.setCode(row.getCell(0).getRichStringCellValue().getString());
+				String collection = row.getCell(1).getRichStringCellValue().getString();
 				Optional<Collection> optC = collectionRepository.findByName(collection);
 				if (optC.isEmpty())
-						throw new ApiException("Collection Dont exists !!!");
+					throw new ApiException("Collection Dont exists !!!");
 				item.setCollection(collectionRepository.findByName(collection).get());
-				item.setDescription(row.getCell(3).getRichStringCellValue().getString());
-				item.setSize(row.getCell(4).getNumericCellValue());
-				item.setPrice(row.getCell(5).getNumericCellValue());
-				item.setType(row.getCell(6).getRichStringCellValue().getString());
-				item.setTrending(Boolean.parseBoolean(row.getCell(7).getRichStringCellValue().getString()));
-				item.setImage1(row.getCell(8).getRichStringCellValue().getString());
-				item.setImage2(row.getCell(9).getRichStringCellValue().getString());
+				item.setDescription(row.getCell(2).getRichStringCellValue().getString());
+				item.setSize(row.getCell(3).getNumericCellValue());
+				item.setPrice(row.getCell(4).getNumericCellValue());
+				item.setType(row.getCell(5).getRichStringCellValue().getString());
+				item.setTrending(row.getCell(6).getBooleanCellValue());
+				item.setProductDetails(row.getCell(7).getRichStringCellValue().getString());
 				itemRepository.save(item);
 			}
 		} catch (IOException e) {
 			throw new ApiException(" Excel File Invalid ");
-		} 
-		
+		}
+
 		return false;
 	}
+
 	private boolean handleZipFile(MultipartFile file) {
-		return false;
+		String destDir = "src/main/resources/unzip";
+		File dir = new File(destDir);
+		if (!dir.exists())
+			dir.mkdirs();
+		FileInputStream fis;
+		byte[] buffer = new byte[1024];
+		try {
+			fis = (FileInputStream) file.getInputStream();
+			ZipInputStream zis = new ZipInputStream(fis);
+			ZipEntry ze = zis.getNextEntry();
+			File newFile = null;
+			while (ze != null) {
+				String fileName = ze.getName();
+				newFile = new File(destDir + File.separator + fileName);
+				System.out.println("Unzipping to " + newFile.getAbsolutePath());
+				new File(newFile.getParent()).mkdirs();
+				FileOutputStream fos = new FileOutputStream(newFile);
+				int len;
+				while ((len = zis.read(buffer)) > 0) {
+					fos.write(buffer, 0, len);
+				}				
+				fos.close();
+				zis.closeEntry();
+				FileSystemResource fsr = new FileSystemResource(newFile);
+				String fileUrl = uploadImageToImgbb(fsr);
+				fileName = fileName.substring(0, fileName.length() - 4);
+				Optional<Item> item = itemRepository.getByCode(fileName.substring(0, fileName.length() - 1));
+				if (item.isPresent()) {
+					if (fileName.substring(fileName.length() - 1, fileName.length()).equals("a")) {
+						item.get().setImage1(fileUrl);
+					}
+					if (fileName.substring(fileName.length() - 1, fileName.length()).equals("b")) {
+						item.get().setImage2(fileUrl);
+					}
+				}
+				ze = zis.getNextEntry();
+			}
+			zis.closeEntry();
+			zis.close();
+			fis.close();	
+			
+			File[] files = dir.listFiles();
+		    if(files!=null) { 
+		        for(File f: files) {
+		                f.delete();
+		        }
+		    }
+		    dir.delete();
+		    
+			return true;
+		} catch (IOException e) {
+			//e.printStackTrace();
+			return false;
+		}
+
 	}
-	
+
 }

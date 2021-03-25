@@ -136,15 +136,7 @@ public class AdminController {
 	@PostMapping("/bulkUpload")
 	public String bulkUpload(@RequestHeader String token, @ModelAttribute PayLoad payload) {
 		try {
-				String chk = adminService.bulkUpload(payload);
-			 if (chk == "both")
-				 return "OK";
-			 else if (chk == "first")
-				 throw new ResponseStatusException(HttpStatus.CONFLICT,"action failed - Zip file invalid");
-			 else if (chk =="second")
-				 throw new ResponseStatusException(HttpStatus.CONFLICT,"action failed - Excel file invalid");
-			 else 
-				 throw new ResponseStatusException(HttpStatus.CONFLICT,"action failed - files invalid");
+			return adminService.bulkUpload(payload);
 		} catch (ApiException e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
 		}
