@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import app.core.entities.Entry;
+import app.core.entities.Stock;
 
-public interface EntryRepository extends JpaRepository<Entry, Integer>{
+public interface EntryRepository extends JpaRepository<Stock, Integer>{
 
-	List<Entry> findByItemCode(String code);
+	List<Stock> findByItemCode(String code);
+	
+	List<Stock> findByItemId(int id);
 
 }

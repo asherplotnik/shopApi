@@ -36,7 +36,7 @@ public class Item {
 	private String image2;
 	@JsonIgnore
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Entry>entries;
+	private List<Stock>stock;
 	
 	public Item() {
 	}
@@ -67,12 +67,12 @@ public class Item {
 		this.image2 = image2;
 	}
 	
-	public void addEntry(Entry entry) {
-		if (entries == null) {
-			entries = new ArrayList<>(); 
+	public void addEntry(Stock entry) {
+		if (stock == null) {
+			stock = new ArrayList<>(); 
 		}
 		entry.setItem(this);
-		entries.add(entry);
+		stock.add(entry);
 	}
 
 	public Integer getId() {
@@ -91,12 +91,12 @@ public class Item {
 		this.code = code;
 	}
 
-	public List<Entry> getEnteries() {
-		return entries;
+	public List<Stock> getStock() {
+		return stock;
 	}
 
-	public void setEnteries(List<Entry> enteries) {
-		this.entries = enteries;
+	public void setStock(List<Stock> stock) {
+		this.stock = stock;
 	}
 
 	public String getProductDetails() {
@@ -179,7 +179,7 @@ public class Item {
 		result = prime * result + ((code == null) ? 0 : code.hashCode());
 		result = prime * result + ((collection == null) ? 0 : collection.hashCode());
 		result = prime * result + ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((entries == null) ? 0 : entries.hashCode());
+		result = prime * result + ((stock == null) ? 0 : stock.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((image1 == null) ? 0 : image1.hashCode());
 		result = prime * result + ((image2 == null) ? 0 : image2.hashCode());
@@ -218,10 +218,10 @@ public class Item {
 				return false;
 		} else if (!description.equals(other.description))
 			return false;
-		if (entries == null) {
-			if (other.entries != null)
+		if (stock == null) {
+			if (other.stock != null)
 				return false;
-		} else if (!entries.equals(other.entries))
+		} else if (!stock.equals(other.stock))
 			return false;
 		if (id == null) {
 			if (other.id != null)

@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import app.core.apiException.ApiException;
 import app.core.entities.AboutContent;
 import app.core.entities.Collection;
+import app.core.entities.Item;
 import app.core.entities.Slide;
 import app.core.services.AdminService;
 import app.core.util.PayLoad;
@@ -106,4 +107,46 @@ public class AdminController {
 		}
 	}
 	
+	@PostMapping(path = "/addItem", consumes = {"multipart/form-data"})
+	public Item addItem(@RequestHeader String token, @ModelAttribute PayLoad payload) {
+		try {
+			return adminService.addItem(payload);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	
+	@PostMapping(path = "/updateItem", consumes = {"multipart/form-data"})
+	public Item updateItem(@RequestHeader String token, @ModelAttribute PayLoad payload) {
+		try {
+			return adminService.updateItem(payload);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	
+	@DeleteMapping("/deleteItem/{id}")
+	public int deleteItem(@RequestHeader String token, @PathVariable int id) {
+		try {
+			return adminService.deleteItemById(id);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	@PostMapping("/bulkUpload")
+	public String bulkUpload(@RequestHeader String token, @ModelAttribute PayLoad payload) {
+		try {
+				String chk = adminService.bulkUpload(payload);
+			 if (chk == "both")
+				 return "OK";
+			 else if (chk == "first")
+				 throw new ResponseStatusException(HttpStatus.CONFLICT,"action failed - Zip file invalid");
+			 else if (chk =="second")
+				 throw new ResponseStatusException(HttpStatus.CONFLICT,"action failed - Excel file invalid");
+			 else 
+				 throw new ResponseStatusException(HttpStatus.CONFLICT,"action failed - files invalid");
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
 }

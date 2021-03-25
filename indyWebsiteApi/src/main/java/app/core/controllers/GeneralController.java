@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import app.core.apiException.ApiException;
 import app.core.entities.AboutContent;
 import app.core.entities.Collection;
-import app.core.entities.Entry;
+import app.core.entities.Stock;
 import app.core.entities.Item;
 import app.core.entities.Slide;
 import app.core.services.GeneralService;
@@ -27,7 +27,7 @@ public class GeneralController {
 	GeneralService generalService;
 	
 	@GetMapping("/getSlideImages")
-	public List<Slide> getCompanyDetails() {
+	public List<Slide> getSlideImages() {
 		List<Slide> list = generalService.getSlideImages();
 		return list;
 	}
@@ -64,8 +64,8 @@ public class GeneralController {
 	}
 	
 	@GetMapping("/getStockByCode/{code}")
-	public List<Entry> getEntriesByCode(@PathVariable String code) {
-		List<Entry> items = generalService.getEntriesByCode(code);
+	public List<Stock> getEntriesByCode(@PathVariable String code) {
+		List<Stock> items = generalService.getStockByCode(code);
 		if (items != null) {
 			return items;
 		} else {
@@ -82,4 +82,30 @@ public class GeneralController {
 		}
 	}
 	
+	@GetMapping("/getItems")
+	public List<Item> getItems() {
+		try {
+			return generalService.getItems();
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
+		}
+	}
+	@GetMapping("/getStock")
+	public List<Stock> getStock() {
+		try {
+			return generalService.getStock();
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
+		}
+	}
+	
+	@GetMapping("/getStockById/{id}")
+	public List<Stock> getStock(@PathVariable int id) {
+		try {
+			return generalService.getStockById(id);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
+		}
+	}
+
 }

@@ -1,6 +1,7 @@
 package app.core.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,5 +11,5 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{
 
 	List<Item> findByCollectionName(String collection);
 	
-	Item getByCode(String code);
+	Optional<Item> getByCode(String code);
 }

@@ -1,13 +1,15 @@
 package app.core.services;
 
 import java.util.List;
+import java.util.Optional;
+
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import app.core.apiException.ApiException;
 import app.core.entities.AboutContent;
 import app.core.entities.Collection;
-import app.core.entities.Entry;
+import app.core.entities.Stock;
 import app.core.entities.Item;
 import app.core.entities.Slide;
 import app.core.repositories.AboutContentRepository;
@@ -46,8 +48,28 @@ public class GeneralService {
 		return collectionRepository.findAll();
 	}
 	
-	public List<Item> getItems(){
+	public Collection getCollectionByName(String name) {
+		Optional<Collection> opt = collectionRepository.findByName(name);
+		if (opt.isPresent()){
+			return opt.get();
+		} else {
+			return null;
+		}
+	}
+	
+	public List<Item> getItems() throws ApiException{
+		try {
 		return itemRepository.findAll();
+		} catch (Exception e) {
+			throw new ApiException("Get Items failed!!!");
+		}
+	}
+	public List<Stock> getStock() throws ApiException{
+		try {
+			return entryRepository.findAll();
+		} catch (Exception e) {
+			throw new ApiException("Get Stock failed!!!");
+		}
 	}
 	
 	public List<Item> getItemsByCollectionName(String collection){
@@ -55,11 +77,24 @@ public class GeneralService {
 	}
 	
 	public Item getProductByCode(String code) {
-		return itemRepository.getByCode(code);
+		Optional<Item> item  = itemRepository.getByCode(code);
+		if (item.isPresent()) {
+			return item.get();
+		}else {
+			return null;
+		}
 	}
 	
-	public List<Entry> getEntriesByCode(String code) {
+	public List<Stock> getStockByCode(String code) {
 		return entryRepository.findByItemCode(code);
+	}
+	
+	public List<Stock> getStockById(int id) throws ApiException {
+		try {
+		return entryRepository.findByItemId(id);
+		} catch (Exception e) {
+			throw new ApiException("Get stock failed!!!");
+		}
 	}
 	
 	public List<AboutContent> getContnent() throws ApiException {
@@ -69,6 +104,7 @@ public class GeneralService {
 			throw new ApiException("Get content failed!!!");
 		}
 	}
+	
 	
 
 }

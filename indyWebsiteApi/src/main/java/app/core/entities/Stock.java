@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class Entry {
+public class Stock {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -17,21 +17,20 @@ public class Entry {
 	private String variation;
 	private int qty;
 	private String img;
-	@JsonIgnore
 	@ManyToOne
 	private Item item;
 
-	public Entry() {
+	public Stock() {
 	}
 
-	public Entry(Integer id, String variation, int qty, String img) {
+	public Stock(Integer id, String variation, int qty, String img) {
 		this.id = id;
 		this.variation = variation;
 		this.qty = qty;
 		this.img = img;
 	}
 
-	public Entry(String variation, int qty, String img) {
+	public Stock(String variation, int qty, String img) {
 		this.variation = variation;
 		this.qty = qty;
 		this.img = img;
@@ -99,7 +98,7 @@ public class Entry {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Entry other = (Entry) obj;
+		Stock other = (Stock) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
