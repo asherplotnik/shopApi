@@ -17,6 +17,7 @@ import app.core.entities.AboutContent;
 import app.core.entities.Collection;
 import app.core.entities.Item;
 import app.core.entities.Slide;
+import app.core.entities.Stock;
 import app.core.services.AdminService;
 import app.core.util.PayLoad;
 
@@ -133,7 +134,7 @@ public class AdminController {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
 		}
 	}
-	@PostMapping("/bulkUpload")
+	@PostMapping(path = "/bulkUpload", consumes = {"multipart/form-data"})
 	public String bulkUpload(@RequestHeader String token, @ModelAttribute PayLoad payload) {
 		try {
 			return adminService.bulkUpload(payload);
@@ -141,4 +142,24 @@ public class AdminController {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
 		}
 	}
+	
+	@PostMapping(path= "/addVariation", consumes = {"multipart/form-data"})
+	public Stock addVariation(@RequestHeader String token, @ModelAttribute PayLoad payload) {
+		try {
+			return adminService.addVariation(payload);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	
+	@DeleteMapping("/deleteVariation/{code}/{variation}")
+	public Stock deleteVariation(@RequestHeader String token, @PathVariable String code, @PathVariable String variation) {
+		try {
+			return adminService.deleteVariation(code,variation);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	
+	
 }

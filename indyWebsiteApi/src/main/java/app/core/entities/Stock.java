@@ -1,10 +1,16 @@
 package app.core.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -19,7 +25,10 @@ public class Stock {
 	private String img;
 	@ManyToOne
 	private Item item;
-
+	@JsonIgnore
+	@OneToMany (mappedBy = "stock", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Trans> trans;
+	
 	public Stock() {
 	}
 
@@ -40,8 +49,14 @@ public class Stock {
 		return id;
 	}
 	
+	public void addTrans(Trans transEntry) {
+		if (trans == null) {
+			trans = new ArrayList<>();
+		}
+		transEntry.setStock(this);
+		trans.add(transEntry);
+	}
 	
-
 	public String getImg() {
 		return img;
 	}
@@ -76,6 +91,16 @@ public class Stock {
 
 	public void setItem(Item item) {
 		this.item = item;
+	}
+	
+	
+
+	public List<Trans> getTrans() {
+		return trans;
+	}
+
+	public void setTrans(List<Trans> trans) {
+		this.trans = trans;
 	}
 
 	@Override

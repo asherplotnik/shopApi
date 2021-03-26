@@ -36,7 +36,7 @@ public class Item {
 	private String image2;
 	@JsonIgnore
 	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Stock>stock;
+	private List<Stock> stock;
 	
 	public Item() {
 	}
@@ -67,7 +67,7 @@ public class Item {
 		this.image2 = image2;
 	}
 	
-	public void addEntry(Stock entry) {
+	public void addStock(Stock entry) {
 		if (stock == null) {
 			stock = new ArrayList<>(); 
 		}

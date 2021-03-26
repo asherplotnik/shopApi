@@ -31,10 +31,12 @@ import app.core.entities.AboutContent;
 import app.core.entities.Collection;
 import app.core.entities.Item;
 import app.core.entities.Slide;
+import app.core.entities.Stock;
 import app.core.repositories.AboutContentRepository;
 import app.core.repositories.CollectionRepository;
 import app.core.repositories.ItemRepository;
 import app.core.repositories.SlideRepository;
+import app.core.repositories.StockRepository;
 import app.core.util.PayLoad;
 
 @Service
@@ -48,6 +50,8 @@ public class AdminService {
 	private CollectionRepository collectionRepository;
 	@Autowired
 	private ItemRepository itemRepository;
+	@Autowired
+	private StockRepository stockRepository;
 
 	@Value("${imgbb.api.key}")
 	private String imgbbApiKey;
@@ -58,6 +62,37 @@ public class AdminService {
 			return aboutContentRepository.save(content);
 		} catch (Exception e) {
 			throw new ApiException("Update content failed!!!");
+		}
+	}
+
+	public Stock addVariation(PayLoad payload) throws ApiException {
+		String code = payload.getMainTitleT();
+		String variation = payload.getMainTitle();
+		MultipartFile image = payload.getFirstImage();
+		Optional<Item> oItem = itemRepository.getByCode(code);
+		if (oItem.isEmpty())
+			throw new ApiException("Item invalid!!!");
+		for (Stock currentVar : oItem.get().getStock()) {
+			if (currentVar.getVariation() == variation) {
+				throw new ApiException("Variation exists already!!!");
+			}
+		}
+		String imageUrl = uploadImageToImgbb(image);
+		Stock stock = new Stock(variation, 0, imageUrl);
+		oItem.get().addStock(stock);
+		return stock;
+	}
+
+	public Stock deleteVariation(String code, String variation) throws ApiException {
+		try {
+			Optional<Stock> stock = stockRepository.findByItemCodeAndVariation(code, variation);
+			if (stock.isEmpty()) {
+				throw new ApiException("Variation dont exists!!!");
+			}
+			stockRepository.delete(stock.get());
+			return stock.get();
+		} catch (Exception e) {
+			throw new ApiException(e.getLocalizedMessage());
 		}
 	}
 
@@ -360,7 +395,7 @@ public class AdminService {
 				int len;
 				while ((len = zis.read(buffer)) > 0) {
 					fos.write(buffer, 0, len);
-				}				
+				}
 				fos.close();
 				zis.closeEntry();
 				FileSystemResource fsr = new FileSystemResource(newFile);
@@ -379,19 +414,19 @@ public class AdminService {
 			}
 			zis.closeEntry();
 			zis.close();
-			fis.close();	
-			
+			fis.close();
+
 			File[] files = dir.listFiles();
-		    if(files!=null) { 
-		        for(File f: files) {
-		                f.delete();
-		        }
-		    }
-		    dir.delete();
-		    
+			if (files != null) {
+				for (File f : files) {
+					f.delete();
+				}
+			}
+			dir.delete();
+
 			return true;
 		} catch (IOException e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			return false;
 		}
 
