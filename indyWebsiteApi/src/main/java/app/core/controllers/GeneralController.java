@@ -14,6 +14,7 @@ import app.core.apiException.ApiException;
 import app.core.entities.AboutContent;
 import app.core.entities.Collection;
 import app.core.entities.Stock;
+import app.core.entities.Trans;
 import app.core.entities.Item;
 import app.core.entities.Slide;
 import app.core.services.GeneralService;
@@ -103,6 +104,15 @@ public class GeneralController {
 	public List<Stock> getStock(@PathVariable int id) {
 		try {
 			return generalService.getStockById(id);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
+		}
+	}
+	
+	@GetMapping("/getTransactions/{code}")
+	public List<Trans> getTransactions(@PathVariable String code) {
+		try {
+			return generalService.getTransactions(code);
 		} catch (ApiException e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
 		}

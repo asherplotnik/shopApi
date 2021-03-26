@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -32,12 +33,14 @@ import app.core.entities.Collection;
 import app.core.entities.Item;
 import app.core.entities.Slide;
 import app.core.entities.Stock;
+import app.core.entities.Trans;
 import app.core.repositories.AboutContentRepository;
 import app.core.repositories.CollectionRepository;
 import app.core.repositories.ItemRepository;
 import app.core.repositories.SlideRepository;
 import app.core.repositories.StockRepository;
 import app.core.util.PayLoad;
+import app.core.util.TransactionForm;
 
 @Service
 @Transactional
@@ -95,7 +98,17 @@ public class AdminService {
 			throw new ApiException(e.getLocalizedMessage());
 		}
 	}
-
+	
+	public Trans addTransaction(TransactionForm tf) throws ApiException {
+		Optional<Stock> stock = stockRepository.findByItemCodeAndVariation(tf.getCode(), tf.getVariation());
+		if (stock.isPresent()) {
+			Trans trans = new Trans(tf.getQty(), tf.isInorout(), LocalDateTime.now(), tf.getNote(), -1);
+			stock.get().addTrans(trans);
+			return trans;
+		}
+		throw new ApiException(" Add TRansaction Failed!!!");
+	}
+	
 	public AboutContent getContnent() throws ApiException {
 		try {
 			Optional<AboutContent> opt = aboutContentRepository.findById(1);

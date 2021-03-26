@@ -1,6 +1,6 @@
 package app.core.entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +16,7 @@ public class Trans {
 	private Integer id;
 	private int qty;
 	private boolean inorout;
-	private LocalDate transdate;
+	private LocalDateTime transdate;
 	private String note;
 	private int orderid;
 	@ManyToOne
@@ -25,7 +25,7 @@ public class Trans {
 	public Trans() {
 	}
 
-	public Trans(Integer id, int qty, boolean inorout, LocalDate transdate, String note, int orderid) {
+	public Trans(Integer id, int qty, boolean inorout, LocalDateTime transdate, String note, int orderid) {
 		this.id = id;
 		this.qty = qty;
 		this.inorout = inorout;
@@ -34,7 +34,7 @@ public class Trans {
 		this.orderid = orderid;
 	}
 
-	public Trans(int qty, boolean inorout, LocalDate transdate, String note, int orderid) {
+	public Trans(int qty, boolean inorout, LocalDateTime transdate, String note, int orderid) {
 		this.qty = qty;
 		this.inorout = inorout;
 		this.transdate = transdate;
@@ -66,11 +66,11 @@ public class Trans {
 		this.inorout = inorout;
 	}
 
-	public LocalDate getTransdate() {
+	public LocalDateTime getTransdate() {
 		return transdate;
 	}
 
-	public void setTransdate(LocalDate transdate) {
+	public void setTransdate(LocalDateTime transdate) {
 		this.transdate = transdate;
 	}
 

@@ -18,8 +18,10 @@ import app.core.entities.Collection;
 import app.core.entities.Item;
 import app.core.entities.Slide;
 import app.core.entities.Stock;
+import app.core.entities.Trans;
 import app.core.services.AdminService;
 import app.core.util.PayLoad;
+import app.core.util.TransactionForm;
 
 @RestController
 @RequestMapping("/admin")
@@ -152,10 +154,19 @@ public class AdminController {
 		}
 	}
 	
-	@DeleteMapping("/deleteVariation/{code}/{variation}")
+	@DeleteMapping("/deleteVariation")
 	public Stock deleteVariation(@RequestHeader String token, @PathVariable String code, @PathVariable String variation) {
 		try {
 			return adminService.deleteVariation(code,variation);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	
+	@PostMapping("/addTransaction")
+	public Trans addTransaction(@RequestHeader String token, @ModelAttribute TransactionForm tf) {
+		try {
+			return adminService.addTransaction(tf);
 		} catch (ApiException e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
 		}

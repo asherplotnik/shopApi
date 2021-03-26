@@ -10,6 +10,7 @@ import app.core.apiException.ApiException;
 import app.core.entities.AboutContent;
 import app.core.entities.Collection;
 import app.core.entities.Stock;
+import app.core.entities.Trans;
 import app.core.entities.Item;
 import app.core.entities.Slide;
 import app.core.repositories.AboutContentRepository;
@@ -17,6 +18,7 @@ import app.core.repositories.CollectionRepository;
 import app.core.repositories.EntryRepository;
 import app.core.repositories.ItemRepository;
 import app.core.repositories.SlideRepository;
+import app.core.repositories.TransactionRepository;
 
 @Service
 @Transactional
@@ -32,6 +34,8 @@ public class GeneralService {
 	private EntryRepository entryRepository;	
 	@Autowired
 	private AboutContentRepository aboutContentRepository;
+	@Autowired
+	private TransactionRepository transactionRepository;
 	
 	public GeneralService() {
 	}
@@ -102,6 +106,14 @@ public class GeneralService {
 			return aboutContentRepository.findAll();
 		} catch (Exception e) {
 			throw new ApiException("Get content failed!!!");
+		}
+	}
+	
+	public List<Trans> getTransactions(String code) throws ApiException {
+		try {
+			return transactionRepository.findByStockItemCode(code);
+		} catch (Exception e) {
+			throw new ApiException("Get transactions failed!!!");
 		}
 	}
 	
