@@ -103,12 +103,6 @@ public class Trans {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + (inorout ? 1231 : 1237);
-		result = prime * result + ((note == null) ? 0 : note.hashCode());
-		result = prime * result + orderid;
-		result = prime * result + qty;
-		result = prime * result + ((stock == null) ? 0 : stock.hashCode());
-		result = prime * result + ((transdate == null) ? 0 : transdate.hashCode());
 		return result;
 	}
 
@@ -125,27 +119,6 @@ public class Trans {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
-			return false;
-		if (inorout != other.inorout)
-			return false;
-		if (note == null) {
-			if (other.note != null)
-				return false;
-		} else if (!note.equals(other.note))
-			return false;
-		if (orderid != other.orderid)
-			return false;
-		if (qty != other.qty)
-			return false;
-		if (stock == null) {
-			if (other.stock != null)
-				return false;
-		} else if (!stock.equals(other.stock))
-			return false;
-		if (transdate == null) {
-			if (other.transdate != null)
-				return false;
-		} else if (!transdate.equals(other.transdate))
 			return false;
 		return true;
 	}

@@ -39,6 +39,7 @@ import app.core.repositories.CollectionRepository;
 import app.core.repositories.ItemRepository;
 import app.core.repositories.SlideRepository;
 import app.core.repositories.StockRepository;
+import app.core.repositories.TransactionRepository;
 import app.core.util.PayLoad;
 import app.core.util.TransactionForm;
 
@@ -55,6 +56,8 @@ public class AdminService {
 	private ItemRepository itemRepository;
 	@Autowired
 	private StockRepository stockRepository;
+	@Autowired
+	private TransactionRepository transactionRepository;
 
 	@Value("${imgbb.api.key}")
 	private String imgbbApiKey;
@@ -103,10 +106,49 @@ public class AdminService {
 		Optional<Stock> stock = stockRepository.findByItemCodeAndVariation(tf.getCode(), tf.getVariation());
 		if (stock.isPresent()) {
 			Trans trans = new Trans(tf.getQty(), tf.isInorout(), LocalDateTime.now(), tf.getNote(), -1);
-			stock.get().addTrans(trans);
-			return trans;
+			if (checkNegativeStock(tf.getQty(), stock.get().getQty(), tf.isInorout(), true)) {
+				stock.get().addTrans(trans);
+				return trans;
+			}
 		}
-		throw new ApiException(" Add TRansaction Failed!!!");
+		throw new ApiException(" Add Transaction Failed!!!");
+	}
+	public String removeTransaction(int transId) throws ApiException {
+		Optional<Trans> trans = transactionRepository.findById(transId);
+		if(trans.isPresent()) {
+			Optional<Stock> stock = stockRepository.findById(trans.get().getStock().getId());
+			if (checkNegativeStock(trans.get().getQty(),stock.get().getQty(),trans.get().isInorout(), false)) {
+				stock.get().removeTrans(trans.get());
+				return "OK";
+			}		
+		}
+		throw new ApiException(" Remove Transaction Failed!!!");
+	}
+	
+	
+	
+	private boolean checkNegativeStock(int transQty, int stockQty, boolean in, boolean addTrans) {
+		if(addTrans) {
+			if (!in) {
+				stockQty -= transQty;
+				if (stockQty < 0) 
+					return false;
+				else
+					return true;
+			} else {
+				return true;
+			}
+		} else {
+			if (in) {
+				stockQty -= transQty;
+				if (stockQty < 0) 
+					return false;
+				else
+					return true;
+			} else {
+				return true;
+			}
+		}
 	}
 	
 	public AboutContent getContnent() throws ApiException {

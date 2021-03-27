@@ -26,7 +26,7 @@ public class Stock {
 	@ManyToOne
 	private Item item;
 	@JsonIgnore
-	@OneToMany (mappedBy = "stock", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany (mappedBy = "stock", cascade = CascadeType.ALL,orphanRemoval=true, fetch = FetchType.LAZY)
 	private List<Trans> trans;
 	
 	public Stock() {
@@ -49,12 +49,27 @@ public class Stock {
 		return id;
 	}
 	
-	public void addTrans(Trans transEntry) {
+	public boolean addTrans(Trans transEntry) {
 		if (trans == null) {
 			trans = new ArrayList<>();
 		}
 		transEntry.setStock(this);
 		trans.add(transEntry);
+		if(transEntry.isInorout())
+			this.setQty(this.getQty() + transEntry.getQty());
+		else 
+			this.setQty(this.getQty() - transEntry.getQty());			
+		return true;
+	}
+	public boolean removeTrans(Trans transEntry) {
+		if (trans == null ) {
+		}
+		trans.remove(transEntry);
+		if(transEntry.isInorout())
+			this.setQty(this.getQty() - transEntry.getQty());
+		else 
+			this.setQty(this.getQty() + transEntry.getQty());			
+		return true;
 	}
 	
 	public String getImg() {

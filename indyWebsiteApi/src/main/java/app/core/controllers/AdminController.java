@@ -171,6 +171,14 @@ public class AdminController {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
 		}
 	}
+	@DeleteMapping("/removeTransaction/{id}")
+	public String removeTransaction(@RequestHeader String token, @PathVariable int id ) {
+		try {
+			return adminService.removeTransaction(id);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
 	
 	
 }
