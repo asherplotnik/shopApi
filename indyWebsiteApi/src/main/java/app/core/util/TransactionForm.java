@@ -5,6 +5,7 @@ public class TransactionForm  implements Serializable{
 	public TransactionForm() {
 	}
 	private static final long serialVersionUID = 1L;
+	private int id;
 	private String variation;
 	private int qty;
 	private boolean inorout;
@@ -13,6 +14,16 @@ public class TransactionForm  implements Serializable{
 	public String getVariation() {
 		return variation;
 	}
+	
+	public int getId() {
+		return id;
+	}
+
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public void setVariation(String variation) {
 		this.variation = variation;
 	}

@@ -101,7 +101,7 @@ public class AdminService {
 			throw new ApiException(e.getLocalizedMessage());
 		}
 	}
-	
+
 	public Trans addTransaction(TransactionForm tf) throws ApiException {
 		Optional<Stock> stock = stockRepository.findByItemCodeAndVariation(tf.getCode(), tf.getVariation());
 		if (stock.isPresent()) {
@@ -113,25 +113,90 @@ public class AdminService {
 		}
 		throw new ApiException(" Add Transaction Failed!!!");
 	}
+
 	public String removeTransaction(int transId) throws ApiException {
 		Optional<Trans> trans = transactionRepository.findById(transId);
-		if(trans.isPresent()) {
+		if (trans.isPresent()) {
 			Optional<Stock> stock = stockRepository.findById(trans.get().getStock().getId());
-			if (checkNegativeStock(trans.get().getQty(),stock.get().getQty(),trans.get().isInorout(), false)) {
+			if (checkNegativeStock(trans.get().getQty(), stock.get().getQty(), trans.get().isInorout(), false)) {
 				stock.get().removeTrans(trans.get());
 				return "OK";
-			}		
+			}
 		}
 		throw new ApiException(" Remove Transaction Failed!!!");
 	}
-	
-	
-	
+
+	public Trans updateTransaction(TransactionForm tf) throws ApiException {
+		Optional<Trans> otrans = transactionRepository.findById(tf.getId());
+		Trans trans;
+		if (otrans.isPresent()) {
+			trans = otrans.get();
+			System.out.println(trans.getStock().getVariation());
+			System.out.println(tf.getVariation());
+			if (trans.getStock().getVariation().equals(tf.getVariation())) {
+				Optional<Stock> ostock = stockRepository.findById(trans.getStock().getId());
+				Stock stock = ostock.get();
+				int quantity = stock.getQty();
+				if (trans.isInorout()) {
+					quantity -= trans.getQty();
+				} else {
+					quantity += trans.getQty();
+				}	
+				if (tf.isInorout()) {
+					quantity += trans.getQty();
+				} else {
+					quantity -= trans.getQty();
+				}
+				if (quantity < 0) {
+					throw new ApiException("same - Update Transaction Failed!!!");
+				}
+				trans.setInorout(tf.isInorout());
+				trans.setNote(tf.getNote());
+				trans.setQty(tf.getQty());
+				stock.setQty(quantity);
+				return trans;
+			} else {
+				Optional<Stock> ostock = stockRepository.findById(trans.getStock().getId());
+				Stock stock = ostock.get();
+				int quantity = stock.getQty();
+				if (trans.isInorout()) {
+					quantity -= trans.getQty();
+				} else {
+					quantity += trans.getQty();
+				}
+				if (quantity < 0) {
+					throw new ApiException("different origianl transaction - Transaction Failed!!!");
+				}
+				stock.setQty(quantity);
+				ostock = stockRepository.findByItemCodeAndVariation(trans.getStock().getItem().getCode(), tf.getVariation());
+				if (ostock.isPresent()) {
+					stock = ostock.get();
+				}
+				quantity = stock.getQty();
+				if (tf.isInorout()) {
+					quantity += tf.getQty();
+				} else {
+					quantity -= tf.getQty();
+				}
+				if (quantity < 0) {
+					throw new ApiException("different new transaction - Update Transaction Failed!!!");
+				}
+				trans.setInorout(tf.isInorout());
+				trans.setNote(tf.getNote());
+				trans.setQty(tf.getQty());
+				stock.setQty(quantity);
+				trans.setStock(stock);
+				return trans;
+			}
+		}
+		throw new ApiException(" Update Transaction Failed!!!");
+	}
+
 	private boolean checkNegativeStock(int transQty, int stockQty, boolean in, boolean addTrans) {
-		if(addTrans) {
+		if (addTrans) {
 			if (!in) {
 				stockQty -= transQty;
-				if (stockQty < 0) 
+				if (stockQty < 0)
 					return false;
 				else
 					return true;
@@ -141,7 +206,7 @@ public class AdminService {
 		} else {
 			if (in) {
 				stockQty -= transQty;
-				if (stockQty < 0) 
+				if (stockQty < 0)
 					return false;
 				else
 					return true;
@@ -150,7 +215,7 @@ public class AdminService {
 			}
 		}
 	}
-	
+
 	public AboutContent getContnent() throws ApiException {
 		try {
 			Optional<AboutContent> opt = aboutContentRepository.findById(1);
@@ -309,10 +374,6 @@ public class AdminService {
 				throw new ApiException("Item not found !!!");
 			String image1Url = uploadImageToImgbb(payload.getFirstImage());
 			String image2Url = uploadImageToImgbb(payload.getSecondImage());
-			if (image1Url == null)
-				throw new ApiException("No image Found");
-			if (image2Url == null)
-				throw new ApiException("No image Found");
 			Item item = opt.get();
 			Optional<Item> toChk = itemRepository.getByCode(item.getCode());
 			if (toChk.isPresent() && toChk.get().getId() != item.getId()) {
@@ -329,8 +390,10 @@ public class AdminService {
 			item.setType(payload.getSecondParagraphT());
 			item.setTrending(Boolean.parseBoolean(payload.getThirdParagraph()));
 			item.setProductDetails(payload.getThirdParagraphT());
-			item.setImage1(image1Url);
-			item.setImage2(image2Url);
+			if (image1Url != null)
+				item.setImage1(image1Url);
+			if (image2Url != null)
+				item.setImage2(image2Url);
 			return item;
 		} catch (Exception e) {
 			throw new ApiException(e.getLocalizedMessage());
