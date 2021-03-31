@@ -57,7 +57,7 @@ public class LoginService {
 			session.setAttribute("phone", user.getPhone());
 			session.setAttribute("level", user.getLevel());
 			session.setAttribute("userId", user.getId());
-			session.setAttribute("expiration", session.getLastAccessed());
+			session.setAttribute("expiration", session.getLastAccessed()+216000000);
 			session.setAttribute("token", session.token);
 			return session;
 		} else {
