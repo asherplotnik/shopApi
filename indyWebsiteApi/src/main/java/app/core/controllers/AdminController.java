@@ -1,5 +1,9 @@
 package app.core.controllers;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,15 +14,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import app.core.apiException.ApiException;
 import app.core.entities.AboutContent;
 import app.core.entities.Collection;
 import app.core.entities.Item;
+import app.core.entities.Purchase;
+import app.core.entities.PurchaseEntry;
 import app.core.entities.Slide;
 import app.core.entities.Stock;
 import app.core.entities.Trans;
+import app.core.entities.User;
 import app.core.services.AdminService;
 import app.core.util.PayLoad;
 import app.core.util.TransactionForm;
@@ -189,6 +197,73 @@ public class AdminController {
 	public Trans updateTransaction(@RequestHeader String token, @ModelAttribute TransactionForm tf) {
 		try {
 			return adminService.updateTransaction(tf);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+
+	@GetMapping("/getUsers")
+	public List<User> getUsers(@RequestHeader String token) {
+		try {
+			return adminService.getUsers();
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+
+	@PostMapping(path = "/updateUser", consumes = { "multipart/form-data" })
+	public User updateUser(@RequestHeader String token, @ModelAttribute User user) {
+		try {
+			return adminService.updateUser(user);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+
+	@GetMapping("/getOrders")
+	public List<Purchase> getOrders(@RequestHeader String token) {
+		try {
+			return adminService.getOrders();
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+
+	@GetMapping("/getOrderDetails")
+	public List<PurchaseEntry> getOrderDetails(@RequestHeader String token) {
+		try {
+			return adminService.getOrderDetails();
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	
+	@GetMapping("/getOrderDetailsById/{id}")
+	public List<PurchaseEntry> getOrderDetailsById(@RequestHeader String token, @PathVariable int id) {
+		try {
+			return adminService.getOrderDetailsById(id);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+
+	@PostMapping("/updateOrder")
+	public Purchase updateOrder(@RequestHeader String token, @ModelAttribute Purchase purchase,
+			@RequestParam String time) {
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+			LocalDateTime dateTime = LocalDateTime.parse(time, formatter);
+			purchase.setWiredate(dateTime);
+			return adminService.updateOrder(purchase);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	
+	@DeleteMapping("/deleteOrder/{id}")
+	public Purchase deleteOrder(@RequestHeader String token, @PathVariable int id) {
+		try {
+			return adminService.deleteOrder(id);
 		} catch (ApiException e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
 		}

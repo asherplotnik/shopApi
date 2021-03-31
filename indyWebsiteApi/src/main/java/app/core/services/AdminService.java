@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -31,15 +32,21 @@ import app.core.apiException.ApiException;
 import app.core.entities.AboutContent;
 import app.core.entities.Collection;
 import app.core.entities.Item;
+import app.core.entities.Purchase;
+import app.core.entities.PurchaseEntry;
 import app.core.entities.Slide;
 import app.core.entities.Stock;
 import app.core.entities.Trans;
+import app.core.entities.User;
 import app.core.repositories.AboutContentRepository;
 import app.core.repositories.CollectionRepository;
 import app.core.repositories.ItemRepository;
+import app.core.repositories.PurchaseEntryRepository;
+import app.core.repositories.PurchaseRepository;
 import app.core.repositories.SlideRepository;
 import app.core.repositories.StockRepository;
 import app.core.repositories.TransactionRepository;
+import app.core.repositories.UserRepository;
 import app.core.util.PayLoad;
 import app.core.util.TransactionForm;
 
@@ -58,6 +65,12 @@ public class AdminService {
 	private StockRepository stockRepository;
 	@Autowired
 	private TransactionRepository transactionRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private PurchaseRepository purchaseRepository;
+	@Autowired
+	private PurchaseEntryRepository purchaseEntryRepository;
 
 	@Value("${imgbb.api.key}")
 	private String imgbbApiKey;
@@ -141,14 +154,14 @@ public class AdminService {
 					quantity -= trans.getQty();
 				} else {
 					quantity += trans.getQty();
-				}	
+				}
 				if (tf.isInorout()) {
 					quantity += trans.getQty();
 				} else {
 					quantity -= trans.getQty();
 				}
 				if (quantity < 0) {
-					throw new ApiException("same - Update Transaction Failed!!!");
+					throw new ApiException("Update Transaction Failed!!!");
 				}
 				trans.setInorout(tf.isInorout());
 				trans.setNote(tf.getNote());
@@ -165,10 +178,11 @@ public class AdminService {
 					quantity += trans.getQty();
 				}
 				if (quantity < 0) {
-					throw new ApiException("different origianl transaction - Transaction Failed!!!");
+					throw new ApiException("Update Transaction Failed!!!");
 				}
 				stock.setQty(quantity);
-				ostock = stockRepository.findByItemCodeAndVariation(trans.getStock().getItem().getCode(), tf.getVariation());
+				ostock = stockRepository.findByItemCodeAndVariation(trans.getStock().getItem().getCode(),
+						tf.getVariation());
 				if (ostock.isPresent()) {
 					stock = ostock.get();
 				}
@@ -548,6 +562,87 @@ public class AdminService {
 			return false;
 		}
 
+	}
+
+	public List<User> getUsers() throws ApiException {
+		try {
+			return userRepository.findAll();
+		} catch (Exception e) {
+			throw new ApiException("Get users failed!!!");
+		}
+
+	}
+
+	public User updateUser(User user) throws ApiException {
+		try {
+			Optional<User> opt = userRepository.findById(user.getId());
+			if (opt.isEmpty())
+				throw new ApiException("Update user failed - User not found!!!");
+			User updatedUser = opt.get();
+			updatedUser.setAddress(user.getAddress());
+			updatedUser.setEmail(user.getEmail());
+			updatedUser.setLevel(user.getLevel());
+			updatedUser.setPhone(user.getPhone());
+			updatedUser.setUsername(user.getUsername());
+			return updatedUser;
+		} catch (Exception e) {
+			throw new ApiException("Update users failed!!!");
+		}
+	}
+
+	public List<Purchase> getOrders() throws ApiException {
+		try {
+			return purchaseRepository.findAll();
+		} catch (Exception e) {
+			throw new ApiException("Get orders failed!!!");
+		}
+	}
+
+	public List<PurchaseEntry> getOrderDetails() throws ApiException {
+		try {
+			return purchaseEntryRepository.findAll();
+		} catch (Exception e) {
+			throw new ApiException("Get order details failed!!!");
+		}
+	}
+	
+	public List<PurchaseEntry> getOrderDetailsById(int id) throws ApiException {
+		try {
+			return purchaseEntryRepository.findByPurchaseId(id);
+		} catch (Exception e) {
+			throw new ApiException("Get order details by Id failed!!!");
+		}
+	}
+
+	public Purchase updateOrder(Purchase purchase) throws ApiException {
+		try {
+			Optional<Purchase> opt = purchaseRepository.findById(purchase.getId());
+			if (opt.isEmpty()) {
+				throw new ApiException("Order does not exists");
+			}
+			Purchase order = opt.get();
+			order.setStatus(purchase.getStatus());
+			order.setTracking(purchase.getTracking());
+			order.setAcc(purchase.getAcc());
+			order.setWiredate(purchase.getWiredate());
+			order.setShipping(purchase.getShipping());
+			return order;
+		} catch (Exception e) {
+			throw new ApiException("Update order failed!!!");
+		}
+	}
+
+	public Purchase deleteOrder(int id) throws ApiException {
+		try {
+			Optional<Purchase> opt = purchaseRepository.findById(id);
+			if (opt.isEmpty()) {
+				throw new ApiException("Order does not exists");
+			}
+			purchaseRepository.deleteById(id);
+			return opt.get();
+		} catch (Exception e) {
+			throw new ApiException("Delete order failed!!!");
+		}
 	}
 
 }
