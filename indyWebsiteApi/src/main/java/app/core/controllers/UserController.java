@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ import app.core.entities.Purchase;
 import app.core.entities.PurchaseEntry;
 import app.core.entities.User;
 import app.core.services.UserService;
+import app.core.util.SignInDetails;
 
 @RestController
 @RequestMapping("/user")
@@ -61,5 +63,13 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
 		}
 	}
-
+	
+	@PostMapping("/changePassword")
+	public boolean changePassword(@RequestHeader String token,@RequestBody SignInDetails payload){
+		try {
+			return userService.changePassword(token,payload);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
+		}
+	}
 }
