@@ -39,5 +39,14 @@ public class EmailController {
 		}
 	}
 	
+	@PostMapping("/sendContactUsEmail")
+	public void sendContactUsEmail(@RequestHeader String token,  @ModelAttribute EmailForm emailForm  ) {
+		try {
+			emailService.sendSimpleMessage(emailForm.getEmail(), emailForm.getSubject(), emailForm.getBody());
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());
+		}
+	}
+	
 	
 }

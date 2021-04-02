@@ -10,6 +10,8 @@ public interface EntryRepository extends JpaRepository<Stock, Integer>{
 
 	List<Stock> findByItemCode(String code);
 	
+	Stock findByItemCodeAndVariation(String code, String variation);
+	
 	List<Stock> findByItemId(int id);
 
 }

@@ -11,10 +11,22 @@ public class TransactionForm  implements Serializable{
 	private boolean inorout;
 	private String note;
 	private String code;
+	private int orderid;
+	
 	public String getVariation() {
 		return variation;
 	}
-	
+		
+	public int getOrderid() {
+		return orderid;
+	}
+
+	public void setOrderid(int orderid) {
+		this.orderid = orderid;
+	}
+
+
+
 	public int getId() {
 		return id;
 	}

@@ -72,4 +72,37 @@ public class EmailServiceImpl implements EmailService {
 			throw new ApiException("Send confirmed-email failed !!!");
 		}
 	}
+	
+	@Override
+	public void sendMessageWithAttachment(String to, String subject, String text, File attachmentFile)
+			throws ApiException {
+		try {
+			MimeMessage message = emailSender.createMimeMessage();
+			MimeMessageHelper helper;
+			helper = new MimeMessageHelper(message, true);
+			helper.setFrom("noreply@indyfashion.com");
+			helper.setTo(to);
+			helper.setSubject(subject);
+			helper.setText(text);
+			String destDir = "src/main/resources/attachment";
+			File dir = new File(destDir);
+			if (!dir.exists())
+				dir.mkdirs();
+			FileSystemResource file = new FileSystemResource(attachmentFile);
+			helper.addAttachment("Receipt.pdf", file);
+			emailSender.send(message);
+			File[] files = dir.listFiles();
+			if (files != null) {
+				for (File f : files) {
+					f.delete();
+				}
+			}
+			dir.delete();
+			System.out.println("confirmed email sent to " + to );
+		} catch (MessagingException e) {
+			throw new ApiException("Send confirmed-email failed !!!");
+		} catch (IllegalStateException e) {
+			throw new ApiException("Send confirmed-email failed !!!");
+		} 
+	}
 }

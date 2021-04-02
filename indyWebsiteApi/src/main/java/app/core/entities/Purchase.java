@@ -1,6 +1,7 @@
 package app.core.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -51,6 +52,14 @@ public class Purchase {
 		this.status = status;
 		this.tracking = tracking;
 		this.shipping = shipping;
+	}
+	
+	public void addEntry(PurchaseEntry entry) {
+		if (entries == null) {
+			entries = new ArrayList<>();
+		}
+		entry.setPurchase(this);
+		entries.add(entry);
 	}
 
 	public int getId() {

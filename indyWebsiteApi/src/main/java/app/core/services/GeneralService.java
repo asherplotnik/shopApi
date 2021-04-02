@@ -92,6 +92,9 @@ public class GeneralService {
 	public List<Stock> getStockByCode(String code) {
 		return entryRepository.findByItemCode(code);
 	}
+	public Stock getStockByCodeAndVariation(String code, String variation) {
+		return entryRepository.findByItemCodeAndVariation(code,variation);
+	}
 	
 	public List<Stock> getStockById(int id) throws ApiException {
 		try {

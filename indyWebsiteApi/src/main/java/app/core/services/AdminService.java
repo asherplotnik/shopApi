@@ -118,7 +118,7 @@ public class AdminService {
 	public Trans addTransaction(TransactionForm tf) throws ApiException {
 		Optional<Stock> stock = stockRepository.findByItemCodeAndVariation(tf.getCode(), tf.getVariation());
 		if (stock.isPresent()) {
-			Trans trans = new Trans(tf.getQty(), tf.isInorout(), LocalDateTime.now(), tf.getNote(), -1);
+			Trans trans = new Trans(tf.getQty(), tf.isInorout(), LocalDateTime.now(), tf.getNote(), tf.getOrderid());
 			if (checkNegativeStock(tf.getQty(), stock.get().getQty(), tf.isInorout(), true)) {
 				stock.get().addTrans(trans);
 				return trans;
@@ -156,9 +156,9 @@ public class AdminService {
 					quantity += trans.getQty();
 				}
 				if (tf.isInorout()) {
-					quantity += trans.getQty();
+					quantity += tf.getQty();
 				} else {
-					quantity -= trans.getQty();
+					quantity -= tf.getQty();
 				}
 				if (quantity < 0) {
 					throw new ApiException("Update Transaction Failed!!!");

@@ -1,7 +1,5 @@
 package app.core.controllers;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import app.core.apiException.ApiException;
@@ -248,12 +246,8 @@ public class AdminController {
 	}
 
 	@PostMapping("/updateOrder")
-	public Purchase updateOrder(@RequestHeader String token, @ModelAttribute Purchase purchase,
-			@RequestParam String time) {
+	public Purchase updateOrder(@RequestHeader String token, @RequestBody Purchase purchase) {
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-			LocalDateTime dateTime = LocalDateTime.parse(time, formatter);
-			purchase.setWiredate(dateTime);
 			return adminService.updateOrder(purchase);
 		} catch (ApiException e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getLocalizedMessage());

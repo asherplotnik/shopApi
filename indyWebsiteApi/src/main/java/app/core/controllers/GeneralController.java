@@ -73,6 +73,15 @@ public class GeneralController {
 			throw new ResponseStatusException(HttpStatus.CONFLICT,"Product Not Found");
 		}
 	}
+	@GetMapping("/getStockByCodeAndVariation/{code}/{variation}")
+	public Stock getStockByCodeAndVariation(@PathVariable String code,@PathVariable String variation) {
+		Stock item = generalService.getStockByCodeAndVariation(code,variation);
+		if (item != null) {
+			return item;
+		} else {
+			throw new ResponseStatusException(HttpStatus.CONFLICT,"Product Not Found");
+		}
+	}
 	
 	@GetMapping("/getAboutUs")
 	public List<AboutContent> getAboutUs() {

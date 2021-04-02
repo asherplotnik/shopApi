@@ -19,6 +19,7 @@ import app.core.entities.Purchase;
 import app.core.entities.PurchaseEntry;
 import app.core.entities.User;
 import app.core.services.UserService;
+import app.core.util.CheckoutPayload;
 import app.core.util.SignInDetails;
 
 @RestController
@@ -72,4 +73,14 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
 		}
 	}
+	
+	@PostMapping("/checkoutwire")
+	public Purchase checkoutwire(@RequestHeader String token,@RequestBody CheckoutPayload payload) {
+		try {
+			return userService.saveOrder(token,payload);
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,e.getLocalizedMessage());
+		}
+	}
+	
 }

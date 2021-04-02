@@ -1,14 +1,12 @@
 package app.core.services;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import app.core.apiException.ApiException;
 import app.core.entities.Purchase;
 import app.core.entities.PurchaseEntry;
@@ -19,7 +17,10 @@ import app.core.repositories.UserRepository;
 import app.core.securirty.PasswordUtils;
 import app.core.sessions.Session;
 import app.core.sessions.SessionContext;
+import app.core.util.CheckoutPayload;
+import app.core.util.FirstPdf;
 import app.core.util.SignInDetails;
+import app.core.util.TransactionForm;
 
 @Service
 @Transactional
@@ -32,7 +33,11 @@ public class UserService {
 	private UserRepository userRepository;
 	@Autowired
 	private SessionContext sessionContext;
-
+	@Autowired
+	private AdminService adminService;
+	@Autowired
+	private EmailService emailService;
+	
 	public List<Purchase> getOrders(String token) throws ApiException {
 		try {
 			Session session = sessionContext.getSession(token);
@@ -60,14 +65,7 @@ public class UserService {
 
 	public User updateDetails(String token, User user) throws ApiException {
 		try {
-			Session session = sessionContext.getSession(token);
-			if (session == null)
-				throw new ApiException("User Not Fount !!! ");
-			Optional<User> opt = userRepository.findById((int) session.getAttribute("userId"));
-			if (opt.isEmpty()) {
-				throw new ApiException("User Not Fount !!! ");
-			}
-			User newUser = opt.get();
+			User newUser = getUserWithToken(token);
 			newUser.setAddress(user.getAddress());
 			newUser.setPhone(user.getPhone());
 			newUser.setUsername(user.getUsername());
@@ -79,14 +77,7 @@ public class UserService {
 
 	public User changeEmail(String token, User user) throws ApiException {
 		try {
-			Session session = sessionContext.getSession(token);
-			if (session == null)
-				throw new ApiException("User Not Fount !!! ");
-			Optional<User> opt = userRepository.findById((int) session.getAttribute("userId"));
-			if (opt.isEmpty()) {
-				throw new ApiException("User Not Fount !!! ");
-			}
-			User newUser = opt.get();
+			User newUser = getUserWithToken(token);
 			newUser.setEmail(user.getEmail());
 			return newUser;
 		} catch (Exception e) {
@@ -96,14 +87,7 @@ public class UserService {
 
 	public boolean changePassword(String token, SignInDetails payload) throws ApiException {
 		try {
-			Session session = sessionContext.getSession(token);
-			if (session == null)
-				throw new ApiException("User Not Fount !!! ");
-			Optional<User> opt = userRepository.findById((int) session.getAttribute("userId"));
-			if (opt.isEmpty()) {
-				throw new ApiException("User Not Fount !!! ");
-			}
-			User newUser = opt.get();
+			User newUser = getUserWithToken(token);
 			String salt = PasswordUtils.getSalt(30);
 			String securePassword = PasswordUtils.generateSecurePassword(payload.password, salt);
 			newUser.setPassword(securePassword);
@@ -112,6 +96,60 @@ public class UserService {
 			return true;
 		} catch (Exception e) {
 			throw new ApiException(" change password Failed !!!");
+		}
+	}
+
+	public Purchase saveOrder(String token, CheckoutPayload payload) throws ApiException {
+		try {
+			User user = getUserWithToken(token);
+			Purchase purchase = payload.purchase;
+			List<PurchaseEntry> entries = payload.entries; 
+			purchase.setUser(user);
+			for(int i=0;i< entries.size();i++) {
+				purchase.addEntry(entries.get(i));
+			}
+			Purchase updated = purchaseRepository.save(purchase);
+			if (updated != null) {
+				for (PurchaseEntry entry: purchase.getEntries()) {
+				TransactionForm tf = new TransactionForm();
+					tf.setCode(entry.getCode());
+					tf.setInorout(false);
+					tf.setVariation(entry.getVariation());
+					tf.setNote("ordered: "+purchase.getUser().getUsername());
+					tf.setQty(entry.getQuantity());
+					tf.setOrderid(purchase.getId());
+					adminService.addTransaction(tf);
+				}
+				FirstPdf.createPdfFile(updated);
+				String subject = "Indy fasion - confirmation";
+				String body = "Dear Customer. \n We have received your order and we are proccesing your payment. \n"
+						+ "We will soon send you confirmation of the payment.\n"
+						+"please see attached confirmation of your order.";
+				File newFile = new File(
+						"C:\\Users\\ASHER\\git\\indyWebsiteApi\\indyWebsiteApi\\src\\main\\resources\\confirmImage.pdf");
+				emailService.sendMessageWithAttachment(purchase.getUser().getEmail(), subject, body, newFile);
+				return updated;
+			} else {
+				throw new ApiException(" save order Failed !!!");
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			throw new ApiException(" save order Failed !!!");
+		}
+	}
+
+	public User getUserWithToken(String token) throws ApiException {
+		try {
+			Session session = sessionContext.getSession(token);
+			if (session == null)
+				throw new ApiException("User Not Fount !!! ");
+			Optional<User> opt = userRepository.findById((int) session.getAttribute("userId"));
+			if (opt.isEmpty()) {
+				throw new ApiException("User Not Fount !!! ");
+			}
+			return opt.get();
+		} catch (Exception e) {
+			throw new ApiException(" get user Failed !!!");
 		}
 	}
 
