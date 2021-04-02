@@ -11,5 +11,7 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{
 
 	List<Item> findByCollectionName(String collection);
 	
+	List<Item> findByTrendingTrue();
+		
 	Optional<Item> getByCode(String code);
 }

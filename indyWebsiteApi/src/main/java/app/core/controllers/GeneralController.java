@@ -100,6 +100,15 @@ public class GeneralController {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
 		}
 	}
+	
+	@GetMapping("/getTrending")
+	public List<Item> getTrending() {
+		try {
+			return generalService.getTrending();
+		} catch (ApiException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getLocalizedMessage());
+		}
+	}
 	@GetMapping("/getStock")
 	public List<Stock> getStock() {
 		try {

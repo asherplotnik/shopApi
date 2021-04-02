@@ -68,6 +68,14 @@ public class GeneralService {
 			throw new ApiException("Get Items failed!!!");
 		}
 	}
+	
+	public List<Item> getTrending() throws ApiException{
+		try {
+			return itemRepository.findByTrendingTrue();
+		} catch (Exception e) {
+			throw new ApiException("Get Trending failed!!!");
+		}
+	}
 	public List<Stock> getStock() throws ApiException{
 		try {
 			return entryRepository.findAll();
