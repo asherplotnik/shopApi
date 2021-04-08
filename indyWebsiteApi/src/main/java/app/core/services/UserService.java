@@ -125,8 +125,8 @@ public class UserService {
 				String body = "Dear Customer. \n We have received your order and we are proccesing your payment. \n"
 						+ "We will soon send you confirmation of the payment.\n"
 						+"please see attached confirmation of your order.";
-				File newFile = new File(
-						"C:\\Users\\ASHER\\git\\indyWebsiteApi\\indyWebsiteApi\\src\\main\\resources\\confirmImage.pdf");
+				 String path = new File("src/main/resources/confirm.pdf").getAbsolutePath();    
+				File newFile = new File(path);
 				emailService.sendMessageWithAttachment(purchase.getUser().getEmail(), subject, body, newFile);
 				return updated;
 			} else {

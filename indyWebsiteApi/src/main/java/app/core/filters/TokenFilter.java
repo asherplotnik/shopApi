@@ -31,14 +31,16 @@ public class TokenFilter implements Filter{
 		String token = req.getHeader("token");
 		String acrh = req.getHeader("access-control-request-headers");
 		if (token != null && sessionContext.getSession(token)!=null) {
-			System.out.println("LOGIN FILTER PASS-------------");
 			if(req.getRequestURI().contains("/admin")) {
 				if(((String)sessionContext.getSession(token).getAttribute("level")).equals("admin")) {
+					System.out.println("ADMIN FILTER PASS-------------");
 					chain.doFilter(request, response);					
 				} else {
+					System.out.println("ADMIN FILTER FAILL-------------");
 					res.sendError(HttpStatus.UNAUTHORIZED.value(), "you are not an admin");
 				}
 			} else {
+				System.out.println("LOGIN FILTER PASS-------------");
 				chain.doFilter(request, response);
 			}
 		} else {

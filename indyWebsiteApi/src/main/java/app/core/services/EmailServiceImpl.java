@@ -29,7 +29,7 @@ public class EmailServiceImpl implements EmailService {
 			message.setSubject(subject);
 			message.setText(text);
 			emailSender.send(message);
-			System.out.println("shipped email sent to " + to );
+			System.out.println("shipped email sent to " + to);
 		} catch (Exception e) {
 			throw new ApiException("Send shipped-email failed !!!");
 		}
@@ -50,8 +50,8 @@ public class EmailServiceImpl implements EmailService {
 			File dir = new File(destDir);
 			if (!dir.exists())
 				dir.mkdirs();
-			File newFile = new File(
-					"C:\\Users\\ASHER\\git\\indyWebsiteApi\\indyWebsiteApi\\src\\main\\resources\\attachment\\attachment.pdf");
+			String path = new File("src/main/resources/attachment/attachment.pdf").getAbsolutePath();
+			File newFile = new File(path);
 			attachmentFile.transferTo(newFile);
 			FileSystemResource file = new FileSystemResource(newFile);
 			helper.addAttachment("Receipt.pdf", file);
@@ -63,7 +63,7 @@ public class EmailServiceImpl implements EmailService {
 				}
 			}
 			dir.delete();
-			System.out.println("confirmed email sent to " + to );
+			System.out.println("confirmed email sent to " + to);
 		} catch (MessagingException e) {
 			throw new ApiException("Send confirmed-email failed !!!");
 		} catch (IllegalStateException e) {
@@ -72,7 +72,7 @@ public class EmailServiceImpl implements EmailService {
 			throw new ApiException("Send confirmed-email failed !!!");
 		}
 	}
-	
+
 	@Override
 	public void sendMessageWithAttachment(String to, String subject, String text, File attachmentFile)
 			throws ApiException {
@@ -98,11 +98,11 @@ public class EmailServiceImpl implements EmailService {
 				}
 			}
 			dir.delete();
-			System.out.println("confirmed email sent to " + to );
+			System.out.println("confirmed email sent to " + to);
 		} catch (MessagingException e) {
 			throw new ApiException("Send confirmed-email failed !!!");
 		} catch (IllegalStateException e) {
 			throw new ApiException("Send confirmed-email failed !!!");
-		} 
+		}
 	}
 }

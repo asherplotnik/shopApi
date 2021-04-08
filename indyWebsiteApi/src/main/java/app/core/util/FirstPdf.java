@@ -2,7 +2,6 @@ package app.core.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Date;
 
 //import com.itextpdf.text.Anchor;
@@ -19,25 +18,15 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 //import com.itextpdf.text.Section;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfImage;
-import com.itextpdf.text.pdf.PdfIndirectObject;
-import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import app.core.entities.Purchase;
 import app.core.entities.PurchaseEntry;
 
 
-public class FirstPdf {
-	private static final String FILE = "C:\\Users\\ASHER\\git\\indyWebsiteApi\\indyWebsiteApi\\src\\main\\resources\\confirm.pdf";
-	private static final String DEST = "C:\\Users\\ASHER\\git\\indyWebsiteApi\\indyWebsiteApi\\src\\main\\resources\\confirmImage.pdf";	
-	private static final String IMG = "C:\\Users\\ASHER\\git\\indyWebsiteApi\\indyWebsiteApi\\src\\main\\resources\\Logo.jpg";
-	
+public class FirstPdf {	
     private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
             Font.BOLD);
     //private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
@@ -49,16 +38,17 @@ public class FirstPdf {
 
 	public static void createPdfFile(Purchase purchase) {
         try {
-        	File file = new File(DEST);
-            file.getParentFile().mkdirs();
+            String path = new File("src/main/resources").getAbsolutePath();        	
             Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream(FILE));
+            PdfWriter.getInstance(document, new FileOutputStream(path+"/confirm.pdf"));
             document.open();
             addMetaData(document);
  //           addTitlePage(document);
             addContent(document,purchase);
+            Image image = Image.getInstance(path+"/Logo.jpg");
+            image.setAbsolutePosition(36, 750);
+            document.add(image);
             document.close();
-            manipulatePdf(FILE, DEST, IMG);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -80,22 +70,6 @@ public class FirstPdf {
 //        
 //    }
     
-    public static void manipulatePdf(String src, String dest , String img) throws IOException, DocumentException {
-        PdfReader reader = new PdfReader(src);
-        PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(dest));
-        Image image = Image.getInstance(img);
-        PdfImage stream = new PdfImage(image, "", null);
-        stream.put(new PdfName("ITXT_SpecialId"), new PdfName("123456789"));
-        PdfIndirectObject ref = stamper.getWriter().addToBody(stream);
-        image.setDirectReference(ref.getIndirectReference());
-        image.setAbsolutePosition(36, 750);
- 
-        image.setWidthPercentage(10);
-        PdfContentByte over = stamper.getOverContent(1);
-        over.addImage(image);
-        stamper.close();
-        reader.close();
-    }
 
     private static void addContent(Document document, Purchase purchase) throws DocumentException {
     	Paragraph preface = new Paragraph();
@@ -119,7 +93,7 @@ public class FirstPdf {
         preface.add(new Paragraph("Customer Number: "+purchase.getUser().getId()));
         // createList(subCatPart);
         
-        Paragraph paragraph = new Paragraph("Order Details:");
+        Paragraph paragraph = new Paragraph("Order Details: Order #"+String.valueOf(purchase.getId()));
         paragraph.setAlignment(Element.ALIGN_CENTER);
         addEmptyLine(paragraph, 1);
         preface.add(paragraph);
