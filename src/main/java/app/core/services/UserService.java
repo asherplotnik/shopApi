@@ -75,6 +75,7 @@ public class UserService {
 		}
 	}
 
+	
 	public User changeEmail(String token, User user) throws ApiException {
 		try {
 			User newUser = getUserWithToken(token);
