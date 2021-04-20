@@ -19,7 +19,7 @@ import app.core.util.SignInDetails;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class LoginController {
 	@Autowired
 	LoginService loginService;

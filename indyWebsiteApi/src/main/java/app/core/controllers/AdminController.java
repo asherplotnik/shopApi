@@ -31,7 +31,7 @@ import app.core.util.TransactionForm;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class AdminController {
 
 	@Autowired

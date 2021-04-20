@@ -16,7 +16,7 @@ import app.core.util.EmailForm;
 
 @RestController
 @RequestMapping("/user/email")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class EmailController {
 	@Autowired
 	EmailService emailService;
