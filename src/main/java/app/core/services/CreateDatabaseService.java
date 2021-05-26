@@ -9,10 +9,6 @@ import app.core.entities.AboutContent;
 import app.core.entities.Slide;
 import app.core.entities.User;
 import app.core.repositories.AboutContentRepository;
-//import app.core.repositories.CollectionRepository;
-//import app.core.repositories.EntryRepository;
-//import app.core.repositories.ItemRepository;
-//import app.core.repositories.TransactionRepository;
 import app.core.repositories.SlideRepository;
 import app.core.repositories.UserRepository;
 
@@ -22,16 +18,8 @@ public class CreateDatabaseService {
 	
 	@Autowired
 	private SlideRepository slideRepository;
-//	@Autowired
-//	private CollectionRepository collectionRepository;
-//	@Autowired
-//	private ItemRepository itemRepository;
-//	@Autowired
-//	private EntryRepository entryRepository;	
 	@Autowired
 	private AboutContentRepository aboutContentRepository;
-//	@Autowired
-//	private TransactionRepository transactionRepository;
 	@Autowired
 	private UserRepository userRepository;
 	
@@ -84,7 +72,8 @@ public class CreateDatabaseService {
 		aboutContent.setFirstParagraphT("0879037504");
 		aboutContent.setMainTitle("https://www.youtube.com/channel/UCOleG6EtOlMMU3lhwIGCgcQ");
 		aboutContent.setMainTitleT("https://www.facebook.com/Indy-fashion-101376811323628");
-		aboutContentRepository.save(aboutContent);		
+		aboutContentRepository.save(aboutContent);	
+		System.out.println("initialized Database");
 	}
 
 }
