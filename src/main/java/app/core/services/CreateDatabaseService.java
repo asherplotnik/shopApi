@@ -100,7 +100,7 @@ public class CreateDatabaseService {
 		aboutContent.setMainTitleT("https://www.facebook.com/Indy-fashion-101376811323628");
 		aboutContentRepository.save(aboutContent);	
 		
-		Collection collecection = new Collection("Silver", "Silver Collection", "https://i.ibb.co/LxZ4Bzy/DSC02497.jpg");
+		Collection collecection = new Collection("Silver", "Silver Collection", "https://i.ibb.co/G5Rs9Zw/DSC01634.jpg");
 		collectionRepository.save(collecection);
 		collecection = new Collection("Stainless", "Stainless Steel", "https://i.ibb.co/tskgpw3/SC02.jpg");
 		collectionRepository.save(collecection);
