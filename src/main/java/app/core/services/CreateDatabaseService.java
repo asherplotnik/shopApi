@@ -46,6 +46,15 @@ public class CreateDatabaseService {
 		user.setPhone("66879037504");
 		user.setUsername("asher plotnik");
 		userRepository.save(user);
+		user = new User();
+		user.setAddress("some address");
+		user.setEmail("admin@admin.com");
+		user.setLevel("admin");
+		user.setPassword("a/bGCmR4mWR0LixMRs2Xk03TOovyceoP6cUQYj1fnqM=");
+		user.setSalt("F0Y6kgxMNgiTEsbMzWK7th5zi5wtPR");
+		user.setPhone("111111111");
+		user.setUsername("admin");
+		userRepository.save(user);
 		Slide slide = new Slide();
 		slide.setOriginal("https://i.ibb.co/8M1f4KV/DSC01603.jpg");
 		slide.setThumbnail("https://i.ibb.co/8M1f4KV/DSC01603.jpg");
