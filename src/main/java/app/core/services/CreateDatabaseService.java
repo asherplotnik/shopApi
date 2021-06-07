@@ -1,14 +1,23 @@
 package app.core.services;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import app.core.entities.AboutContent;
+import app.core.entities.Collection;
+import app.core.entities.Item;
 import app.core.entities.Slide;
+import app.core.entities.Stock;
+import app.core.entities.Trans;
 import app.core.entities.User;
 import app.core.repositories.AboutContentRepository;
+import app.core.repositories.CollectionRepository;
+import app.core.repositories.ItemRepository;
 import app.core.repositories.SlideRepository;
 import app.core.repositories.UserRepository;
 
@@ -22,6 +31,10 @@ public class CreateDatabaseService {
 	private AboutContentRepository aboutContentRepository;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private CollectionRepository collectionRepository;
+	@Autowired
+	private ItemRepository itemRepository;
 	
 	public void createDatabase() {
 		User user = new User();
@@ -34,24 +47,28 @@ public class CreateDatabaseService {
 		user.setUsername("asher plotnik");
 		userRepository.save(user);
 		Slide slide = new Slide();
-		slide.setOriginal("https://i.ibb.co/8xYJmQx/DSC01576.jpg");
-		slide.setThumbnail("https://i.ibb.co/8xYJmQx/DSC01576.jpg");
+		slide.setOriginal("https://i.ibb.co/8M1f4KV/DSC01603.jpg");
+		slide.setThumbnail("https://i.ibb.co/8M1f4KV/DSC01603.jpg");
 		slideRepository.save(slide);
 		slide = new Slide();
-		slide.setOriginal("https://i.ibb.co/N1nX5nz/DSC01578.jpg");
-		slide.setThumbnail("https://i.ibb.co/N1nX5nz/DSC01578.jpg");
+		slide.setOriginal("https://i.ibb.co/D8rL7gh/DSC01536.jpg");
+		slide.setThumbnail("https://i.ibb.co/D8rL7gh/DSC01536.jpg");
 		slideRepository.save(slide);
 		slide = new Slide();
-		slide.setOriginal("https://i.ibb.co/0cXf3Km/DSC01630.jpg");
-		slide.setThumbnail("https://i.ibb.co/0cXf3Km/DSC01630.jpg");
+		slide.setOriginal("https://i.ibb.co/VmNGKxj/DSC02364.jpg");
+		slide.setThumbnail("https://i.ibb.co/VmNGKxj/DSC02364.jpg");
 		slideRepository.save(slide);
 		slide = new Slide();
-		slide.setOriginal("https://i.ibb.co/R4WMkx0/DSC01618.jpg");
-		slide.setThumbnail("https://i.ibb.co/R4WMkx0/DSC01618.jpg");
+		slide.setOriginal("https://i.ibb.co/K5tYmGV/DSC01634.jpg");
+		slide.setThumbnail("https://i.ibb.co/K5tYmGV/DSC01634.jpg");
 		slideRepository.save(slide);
 		slide = new Slide();
-		slide.setOriginal("https://i.ibb.co/xLKc3YK/DSC01582.jpg");
-		slide.setThumbnail("https://i.ibb.co/xLKc3YK/DSC01582.jpg");
+		slide.setOriginal("https://i.ibb.co/rdq1cKk/DSC01622.jpg");
+		slide.setThumbnail("https://i.ibb.co/rdq1cKk/DSC01622.jpg");
+		slideRepository.save(slide);
+		slide = new Slide();
+		slide.setOriginal("https://i.ibb.co/7NrwdPZ/N-2377.jpg");
+		slide.setThumbnail("https://i.ibb.co/7NrwdPZ/N-2377.jpg");
 		slideRepository.save(slide);
 		AboutContent aboutContent = new AboutContent();
 		aboutContent.setMainTitle("Indy Fashion");
@@ -73,6 +90,113 @@ public class CreateDatabaseService {
 		aboutContent.setMainTitle("https://www.youtube.com/channel/UCOleG6EtOlMMU3lhwIGCgcQ");
 		aboutContent.setMainTitleT("https://www.facebook.com/Indy-fashion-101376811323628");
 		aboutContentRepository.save(aboutContent);	
+		
+		Collection collecection = new Collection("Silver", "Silver Collection", "https://i.ibb.co/LxZ4Bzy/DSC02497.jpg");
+		collectionRepository.save(collecection);
+		collecection = new Collection("Stainless", "Stainless Steel", "https://i.ibb.co/tskgpw3/SC02.jpg");
+		collectionRepository.save(collecection);
+		collecection = new Collection("Metal", "Metal Collection", "https://i.ibb.co/YRRHyvt/DSC02377-D.jpg");
+		collectionRepository.save(collecection);
+		collecection = new Collection("D.I.Y", "Do It Yourself", "https://i.ibb.co/5FXypSS/DSC01582.jpg");
+		collectionRepository.save(collecection);
+		
+		
+		Item item = new Item("B 0001", "Amazing infinity silver bracelete", "Silver Bracalete", 18.0, 149.99, "BRACELET", false, "https://i.ibb.co/LxZ4Bzy/DSC02497.jpg", "https://i.ibb.co/LxZ4Bzy/DSC02497.jpg");
+		Optional<Collection> opt = collectionRepository.findById(1);
+		item.setCollection(opt.get());
+		Stock stock = new Stock("BLACK", 0, "https://i.ibb.co/LxZ4Bzy/DSC02497.jpg");
+		Trans trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		item = new Item("B 0002", "Awsome Beads silver bracelet", "Beads Silver Bracalete", 17.0, 199.99, "BRACELET", false, "https://i.ibb.co/6gk4tMb/DSC01111-D.jpg", "https://i.ibb.co/6gk4tMb/DSC01111-D.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("PINK", 0, "https://i.ibb.co/6gk4tMb/DSC01111-D.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		item = new Item("B 0003", "Awsome Pearls silver bracelet", "Pearls Silver Bracalete", 16.0, 299.99, "BRACELET", false, "https://i.ibb.co/G5Rs9Zw/DSC01634.jpg", "https://i.ibb.co/G5Rs9Zw/DSC01634.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("WHITE", 0, "https://i.ibb.co/G5Rs9Zw/DSC01634.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		opt = collectionRepository.findById(2);
+		item = new Item("N 0001", "Amazing Mens necklace", "Heavy stainless necklace", 16.0, 299.99, "NECKLACE", false, "https://i.ibb.co/tskgpw3/SC02.jpg", "https://i.ibb.co/ygY163f/SC02A.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("STAINLESS", 0, "https://i.ibb.co/tskgpw3/SC02.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		item = new Item("P 0001", "Chick Mens Pendant", "Cool stainless pendant", 16.0, 299.99, "PENDANT", false, "https://i.ibb.co/7QXVSq0/DSC02494.jpg", "https://i.ibb.co/tZ7s3Tc/DSC02491.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("STAINLESS", 0, "https://i.ibb.co/7QXVSq0/DSC02494.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		opt = collectionRepository.findById(3);
+		item = new Item("B 0004", "Amazing Metal bracelet", "Metal bracelet", 16.0, 9.99, "BRACELET", false, "https://i.ibb.co/4Yd7yyv/DSC01555.jpg", "https://i.ibb.co/4Yd7yyv/DSC01555.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("GOLDEN", 0, "https://i.ibb.co/4Yd7yyv/DSC01555.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		item = new Item("B 0005", "Awsome Metal bracelet", "Metal bracelet", 16.0, 17.99, "BRACELET", false, "https://i.ibb.co/MCTGjqF/DSC01581.jpg", "https://i.ibb.co/MCTGjqF/DSC01581.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("BLUE", 0, "https://i.ibb.co/MCTGjqF/DSC01581.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		stock = new Stock("RED", 0, "https://i.ibb.co/fp8zYMq/DSC01578.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		item = new Item("B 0006", "Dragonfly charm bracelet", "cool charm bracelet", 16.0, 8.99, "BRACELET", false, "https://i.ibb.co/92rCdb6/DSC01544.jpg", "https://i.ibb.co/92rCdb6/DSC01544.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("GREY", 0, "https://i.ibb.co/92rCdb6/DSC01544.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		item = new Item("P 0002", "Drop Crustal pendant", "cool drop pendant", 16.0, 58.99, "PENDANT", false, "https://i.ibb.co/my6F8Ht/DSC02377-BB.jpg", "https://i.ibb.co/MPT2JQn/DSC02377-AA.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("LAVENDER", 0, "https://i.ibb.co/my6F8Ht/DSC02377-BB.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		stock = new Stock("SMOKEY", 0, "https://i.ibb.co/R9JX6DY/DSC02377-AA.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		opt = collectionRepository.findById(4);
+		item = new Item("B 0007", "Amazing Metal bracelet", "Do it yourself bracelet", 16.0, 9.99, "BRACELET", false, "https://i.ibb.co/Vt5b85F/DSC01622.jpg", "https://i.ibb.co/Vt5b85F/DSC01622.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("BLACK", 0, "https://i.ibb.co/Vt5b85F/DSC01622.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		item = new Item("B 0008", "Amazing Metal bracelet", "Do it yourself bracelet", 16.0, 29.99, "BRACELET", false, "https://i.ibb.co/5FXypSS/DSC01582.jpg", "https://i.ibb.co/5FXypSS/DSC01582.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("RED", 0, "https://i.ibb.co/5FXypSS/DSC01582.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
+		item = new Item("B 0009", "Amazing Metal bracelet", "Do it yourself bracelet", 16.0, 19.99, "BRACELET", false, "https://i.ibb.co/mz8TkMV/DSC01576.jpg", "https://i.ibb.co/mz8TkMV/DSC01576.jpg");
+		item.setCollection(opt.get());
+		stock = new Stock("PINK", 0, "https://i.ibb.co/mz8TkMV/DSC01576.jpg");
+		trans = new Trans(100, true, LocalDateTime.now(), "initial", -1);
+		stock.addTrans(trans);
+		item.addStock(stock);	
+		itemRepository.save(item);
 		System.out.println("initialized Database");
 	}
 

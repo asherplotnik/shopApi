@@ -17,7 +17,6 @@ public class IndyWebsiteApiApplication {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext ctx = SpringApplication.run(IndyWebsiteApiApplication.class, args);
-		//SpringApplication.run(IndyWebsiteApiApplication.class, args);
 		CreateDatabaseService service = ctx.getBean(CreateDatabaseService.class);
 		//service.createDatabase();
 	}
