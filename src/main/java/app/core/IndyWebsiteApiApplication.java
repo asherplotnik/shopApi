@@ -6,7 +6,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
 import app.core.filters.TokenFilter;
 import app.core.services.CreateDatabaseService;
 import app.core.sessions.SessionContext;
